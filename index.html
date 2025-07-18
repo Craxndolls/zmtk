@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Блокнот онлайн — Центральный народный блокнот</title>
+
+  <link rel="canonical" href="https://zmtk.my" />
+
+  <meta name="description" content="Блокнот онлайн для заметок — бесплатный, удобный, быстрый. Центральный народный блокнот для всех трудящихся. Пиши, сохраняй, возвращайся!" />
+  <meta name="keywords" content="блокнот онлайн, онлайн блокнот, заметки, записать текст, текстовый блокнот, notepad online" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta property="og:title" content="Блокнот онлайн — Центральный народный блокнот" />
+  <meta property="og:description" content="Простой и бесплатный блокнот онлайн. Быстрые заметки без регистрации. Центральный народный блокнот для трудового народа." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://zmtk.my" />
+  <meta property="og:image" content="https://zmtk.my/preview.png" />
+
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#b22222" />
+
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0; height: 100%; overflow: hidden;
+      font-family: monospace; color: #222; transition: background-color 0.5s ease;
+    }
+    body {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: transparent;
+      color: #222;
+      overflow-y: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background-image: url('/images/background.jpg');
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      filter: brightness(1);
+      z-index: -1;
+      transition: filter 0.5s ease;
+      pointer-events: none;
+    }
+    body.dark-mode::before {
+      filter: brightness(0.4);
+    }
+    .notepad-section {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      width: 100%;
+      max-width: 1200px;
+      gap: 20px;
+      padding: 20px;
+      height: 95vh;
+      position: relative;
+      z-index: 1;
+    }
+    .side-image {
+      height: 250px;
+      width: auto;
+      object-fit: contain;
+      opacity: 0.95;
+    }
+    .container-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      max-width: 800px;
+      flex: 1;
+    }
+    .container {
+      width: 100%;
+      height: 100%;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      background-color: #fff;
+      display: flex;
+      flex-direction: column;
+      margin-top: 0;
+      transition: background-color 0.5s ease;
+    }
+    .container.dark-paper { background-color: #f5e7c5; }
+    .header-text { flex: none; margin-bottom: 10px; }
+    .header-text nav { margin-bottom: 10px; }
+    .header-text nav a {
+      font-size: 14px;
+      font-weight: bold;
+      color: #b22222;
+      text-decoration: none;
+      margin-right: 15px;
+      font-family: monospace;
+    }
+    .header-text nav a:hover { text-decoration: underline; }
+    textarea {
+      flex: 1;
+      width: 100%;
+      font-size: 21px;
+      border: none;
+      resize: none;
+      outline: none;
+      background-color: transparent;
+      margin-bottom: 0;
+      color: #222;
+    }
+    .button-row {
+      display: flex;
+      justify-content: flex-end;
+    }
+    button.download-button {
+      background-color: #555;
+      color: #ddd;
+      border: none;
+      border-radius: 4px;
+      padding: 6px 18px;
+      font-size: 12px;
+      cursor: pointer;
+      opacity: 0.6;
+      transition: background-color 0.3s, opacity 0.3s;
+      user-select: none;
+      font-family: monospace;
+    }
+    button.download-button:hover {
+      background-color: #777;
+      opacity: 1;
+    }
+    .easter-button {
+      position: fixed;
+      bottom: 0; right: 0;
+      background-color: #b22222;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 32px; height: 32px;
+      padding: 0;
+      font-size: 16px;
+      cursor: pointer;
+      opacity: 0.75;
+      z-index: 1000;
+      transition: background-color 0.3s, opacity 0.3s;
+      user-select: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .easter-button:hover {
+      background-color: #cc3333;
+      opacity: 1;
+    }
+    .video-wrapper {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(100%);
+      width: 80%;
+      max-width: 700px;
+      transition: transform 0.6s ease;
+      z-index: 999;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .video-wrapper.active {
+      transform: translateX(-50%) translateY(0);
+    }
+    .video-wrapper video {
+      width: 100%;
+      display: block;
+    }
+    .corner-image {
+      position: fixed;
+      top: 0; left: 0;
+      width: 80px;
+      height: auto;
+      z-index: 1001;
+      user-select: none;
+      pointer-events: none;
+    }
+    .switcher-image {
+      position: fixed;
+      top: -25px; left: 58px;
+      width: 80px;
+      height: auto;
+      z-index: 1002;
+      user-select: none;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .switcher-image.pulled {
+      transform: translateY(25px);
+    }
+    #timerContainer {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background-color: rgba(178, 34, 34, 0.5);
+      border-radius: 8px;
+      padding: 10px 15px;
+      box-shadow: 0 0 10px rgba(178, 34, 34, 0.4);
+      font-family: monospace;
+      color: #fff;
+      z-index: 2000;
+      user-select: none;
+      min-width: 140px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.5s ease, box-shadow 0.5s ease;
+    }
+    body.dark-mode #timerContainer {
+      background-color: rgba(139, 0, 0, 0.7);
+      box-shadow: 0 0 12px rgba(139, 0, 0, 0.8);
+    }
+    #timerDisplay {
+      font-size: 22px;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+    .timer-buttons {
+      display: flex;
+      gap: 8px;
+      width: 100%;
+      justify-content: center;
+    }
+    .timer-buttons button {
+      background-color: rgba(122, 22, 22, 0.7);
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-family: monospace;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      user-select: none;
+      flex: 1;
+      text-align: center;
+    }
+    body.dark-mode .timer-buttons button {
+      background-color: rgba(90, 5, 5, 0.85);
+    }
+    .timer-buttons button:hover {
+      background-color: rgba(167, 42, 42, 0.85);
+    }
+    body.dark-mode .timer-buttons button:hover {
+      background-color: rgba(190, 30, 30, 1);
+    }
+    .timer-buttons button:disabled {
+      background-color: rgba(80, 80, 80, 0.5);
+      cursor: not-allowed;
+    }
+    body.dark-mode .timer-buttons button:disabled {
+      background-color: rgba(60, 60, 60, 0.7);
+    }
+    /* Обновленные стили для девочки с часами */
+    .time-girl {
+      position: fixed;
+      right: -400px; /* Увеличено, так как изображение теперь больше */
+      top: 80px; /* Позиционируем под секундомером */
+      height: 400px; /* Увеличиваем в 2 раза */
+      width: auto;
+      z-index: 1999;
+      transition: right 0.5s ease-out;
+      pointer-events: none;
+    }
+    .time-girl.visible {
+      right: 0; /* Теперь впритык к правому краю */
+    }
+  </style>
+</head>
+<body>
+  <img src="/images/upleft.png" alt="Орнамент в левом углу" class="corner-image" />
+  <img src="/images/switcher.png" alt="Выключатель света" class="switcher-image" id="switcher" />
+  
+  <!-- Аудио элементы -->
+  <audio id="switchSound" src="/sound/click.mp3" preload="auto"></audio>
+  <audio id="startSound" src="/sound/start.mp3" preload="auto"></audio>
+  <audio id="pauseSound" src="/sound/pause.mp3" preload="auto"></audio>
+  <audio id="resetSound" src="/sound/reset.mp3" preload="auto"></audio>
+
+  <!-- Девочка с часами - теперь в 2 раза больше -->
+  <img src="/images/timegirl.png" alt="Девочка показывает на часы" class="time-girl" id="timeGirl" />
+
+  <div class="notepad-section">
+    <img src="/images/left.png" alt="Левое изображение" class="side-image" />
+    <div class="container-wrapper">
+      <div class="container" id="notepadContainer">
+        <div class="header-text">
+          <nav><a href="about.html" title="О проекте">О проекте</a></nav>
+          <h1>Блокнот онлайн — Центральный народный блокнот</h1>
+          <p>Удобный бесплатный блокнот онлайн для заметок. Никакой регистрации. Просто пиши, сохраняй и возвращайся, товарищ!</p>
+        </div>
+        <textarea id="notepad" placeholder="Пиши свою заметку в наш онлайн-блокнот — всё сохранится!"></textarea>
+        <div class="button-row">
+          <button class="download-button" id="downloadBtn" title="Скачать файл с заметками">Скачать</button>
+        </div>
+      </div>
+    </div>
+    <img src="/images/right.png" alt="Правое изображение" class="side-image" />
+  </div>
+
+  <div id="timerContainer" aria-label="Секундомер">
+    <div id="timerDisplay">00:00:00</div>
+    <div class="timer-buttons">
+      <button id="resetBtn" type="button">Сброс</button>
+      <button id="pauseBtn" type="button" disabled>Пауза</button>
+      <button id="startBtn" type="button">Запустить</button>
+    </div>
+  </div>
+
+  <button class="easter-button" onclick="toggleVideo()">?</button>
+
+  <div class="video-wrapper" id="videoWrapper">
+    <video controls>
+      <source src="/video/easteregg.mp4" type="video/mp4" />
+      Ваш браузер не поддерживает видео. Установите Chrome, товарищ!
+    </video>
+  </div>
+
+  <script>
+    // Блокнот
+    const textarea = document.getElementById('notepad');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const switcher = document.getElementById('switcher');
+    const body = document.body;
+    const container = document.getElementById('notepadContainer');
+    const switchSound = document.getElementById('switchSound');
+    const timeGirl = document.getElementById('timeGirl');
+
+    let isDark = true;
+    body.classList.add('dark-mode');
+    container.classList.add('dark-paper');
+
+    // Восстановление текста из localStorage
+    textarea.value = localStorage.getItem('savedText') || '';
+
+    // Сохранение текста при изменении
+    textarea.addEventListener('input', () => {
+      localStorage.setItem('savedText', textarea.value);
+    });
+
+    // Скачивание файла
+    downloadBtn.addEventListener('click', () => {
+      const text = textarea.value;
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'central_narodny_blocknot.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    // Переключение видео
+    function toggleVideo() {
+      const videoBox = document.getElementById('videoWrapper');
+      videoBox.classList.toggle('active');
+      
+      // Если видео открывается, запускаем его
+      if (videoBox.classList.contains('active')) {
+        const video = videoBox.querySelector('video');
+        video.currentTime = 0;
+        video.play();
+      }
+    }
+
+    // Переключение темы
+    switcher.addEventListener('click', () => {
+      switcher.classList.add('pulled');
+      setTimeout(() => {
+        switcher.classList.remove('pulled');
+      }, 200);
+
+      // Воспроизведение звука переключения
+      switchSound.currentTime = 0;
+      switchSound.play();
+
+      isDark = !isDark;
+      body.classList.toggle('dark-mode', isDark);
+      container.classList.toggle('dark-paper', isDark);
+    });
+
+    // Секундомер
+    const timerDisplay = document.getElementById('timerDisplay');
+    const resetBtn = document.getElementById('resetBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const startBtn = document.getElementById('startBtn');
+    const timerContainer = document.getElementById('timerContainer');
+    
+    // Аудио для секундомера
+    const startSound = document.getElementById('startSound');
+    const pauseSound = document.getElementById('pauseSound');
+    const resetSound = document.getElementById('resetSound');
+
+    let elapsedSeconds = 0;
+    let running = false;
+    let timerInterval = null;
+
+    // Показать/скрыть девочку с часами
+    function showTimeGirl() {
+      timeGirl.classList.add('visible');
+    }
+    
+    function hideTimeGirl() {
+      timeGirl.classList.remove('visible');
+    }
+
+    // Обработчики для показа девочки при наведении на таймер
+    timerContainer.addEventListener('mouseenter', showTimeGirl);
+    timerContainer.addEventListener('mouseleave', hideTimeGirl);
+    
+    // Также добавляем обработчики для всех кнопок таймера
+    const timerButtons = [startBtn, pauseBtn, resetBtn];
+    timerButtons.forEach(button => {
+      button.addEventListener('mouseenter', showTimeGirl);
+      button.addEventListener('mouseleave', hideTimeGirl);
+    });
+
+    // Форматирование времени в HH:MM:SS
+    function formatTime(seconds) {
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      return [
+        hrs.toString().padStart(2, '0'),
+        mins.toString().padStart(2, '0'),
+        secs.toString().padStart(2, '0'),
+      ].join(':');
+    }
+
+    // Обновление отображения таймера
+    function updateTimerDisplay() {
+      timerDisplay.textContent = formatTime(elapsedSeconds);
+    }
+
+    // Запуск таймера
+    function startTimer() {
+      if (running) return;
+      
+      running = true;
+      startBtn.disabled = true;
+      pauseBtn.disabled = false;
+      
+      // Воспроизведение звука старта
+      startSound.currentTime = 0;
+      startSound.play();
+      
+      timerInterval = setInterval(() => {
+        elapsedSeconds++;
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    // Пауза таймера
+    function pauseTimer() {
+      if (!running) return;
+      
+      running = false;
+      startBtn.disabled = false;
+      pauseBtn.disabled = true;
+      
+      // Воспроизведение звука паузы
+      pauseSound.currentTime = 0;
+      pauseSound.play();
+      
+      clearInterval(timerInterval);
+    }
+
+    // Сброс таймера
+    function resetTimer() {
+      if (running) pauseTimer();
+      
+      elapsedSeconds = 0;
+      
+      // Воспроизведение звука сброса
+      resetSound.currentTime = 0;
+      resetSound.play();
+      
+      updateTimerDisplay();
+    }
+
+    // Назначение обработчиков событий
+    startBtn.addEventListener('click', startTimer);
+    pauseBtn.addEventListener('click', pauseTimer);
+    resetBtn.addEventListener('click', resetTimer);
+
+    // Инициализация отображения таймера
+    updateTimerDisplay();
+  </script>
+</body>
+</html>
