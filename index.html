@@ -115,9 +115,22 @@
       margin-bottom: 0;
       color: #222;
     }
-    .button-row {
+    .footer-row {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .privacy-link {
+      font-size: 12px;
+      color: #666;
+      text-decoration: none;
+      font-family: monospace;
+      transition: color 0.3s;
+    }
+    .privacy-link:hover {
+      color: #b22222;
+      text-decoration: underline;
     }
     button.download-button {
       background-color: #555;
@@ -305,7 +318,8 @@
           <p>Удобный бесплатный блокнот онлайн для заметок. Никакой регистрации. Просто пиши, сохраняй и возвращайся, товарищ!</p>
         </div>
         <textarea id="notepad" placeholder="Пиши свою заметку в наш онлайн-блокнот — всё сохранится!"></textarea>
-        <div class="button-row">
+        <div class="footer-row">
+          <a href="privacy.html" class="privacy-link" title="Политика конфиденциальности">Политика конфиденциальности</a>
           <button class="download-button" id="downloadBtn" title="Скачать файл с заметками">Скачать</button>
         </div>
       </div>
@@ -505,4 +519,3 @@
   </script>
 </body>
 </html>
-
