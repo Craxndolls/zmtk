@@ -292,27 +292,42 @@
     .time-girl.visible {
       right: 0; /* Теперь впритык к правому краю */
     }
-    /* Стили для цитаты дня */
+    /* Обновленные стили для цитаты дня в советском стиле */
     #quoteContainer {
       position: fixed;
-      top: 50%;
-      left: 0;
-      transform: translateY(-50%) rotate(-90deg);
-      transform-origin: left center;
-      background-color: rgba(0, 0, 0, 0.7);
-      color: #f0f0f0;
-      padding: 8px 20px;
-      font-family: monospace;
+      left: 10px;
+      bottom: 10px;
+      background-color: rgba(178, 34, 34, 0.9); /* Красный фон */
+      color: #fff; /* Белый текст */
+      padding: 10px 15px;
+      font-family: 'Arial', sans-serif;
       font-size: 14px;
-      border-radius: 8px;
-      opacity: 0.85;
+      font-weight: bold;
+      border-radius: 4px;
+      border: 2px solid #fff; /* Белая рамка */
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
       z-index: 2000;
-      pointer-events: none;
-      transition: background-color 0.5s ease;
+      max-width: 300px;
+      text-align: center;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
     }
     body.dark-mode #quoteContainer {
-      background-color: rgba(255, 255, 255, 0.1);
-      color: #eee;
+      background-color: rgba(139, 0, 0, 0.9); /* Темно-красный фон в темном режиме */
+      border: 2px solid #f5e7c5; /* Бежевая рамка в темном режиме */
+    }
+    #quoteText {
+      display: inline-block;
+      padding: 5px;
+    }
+    #quoteText::before {
+      content: "“";
+      color: #ffcc00;
+      font-size: 18px;
+    }
+    #quoteText::after {
+      content: "”";
+      color: #ffcc00;
+      font-size: 18px;
     }
   </style>
   <script defer src="https://cloud.umami.is/script.js" data-website-id="d0cd950c-5859-4c4a-85c5-29d885bb3d5d"></script>
@@ -330,7 +345,7 @@
   <!-- Девочка с часами - теперь в 2 раза больше -->
   <img src="/images/timegirl.png" alt="Девочка показывает на часы" class="time-girl" id="timeGirl" />
 
-  <!-- Цитата дня -->
+  <!-- Цитата дня в советском стиле -->
   <div id="quoteContainer" aria-label="Цитата дня">
     <span id="quoteText">Загрузка цитаты...</span>
   </div>
