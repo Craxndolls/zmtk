@@ -292,6 +292,28 @@
     .time-girl.visible {
       right: 0; /* Теперь впритык к правому краю */
     }
+    /* Стили для цитаты дня */
+    #quoteContainer {
+      position: fixed;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%) rotate(-90deg);
+      transform-origin: left center;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: #f0f0f0;
+      padding: 8px 20px;
+      font-family: monospace;
+      font-size: 14px;
+      border-radius: 8px;
+      opacity: 0.85;
+      z-index: 2000;
+      pointer-events: none;
+      transition: background-color 0.5s ease;
+    }
+    body.dark-mode #quoteContainer {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: #eee;
+    }
   </style>
   <script defer src="https://cloud.umami.is/script.js" data-website-id="d0cd950c-5859-4c4a-85c5-29d885bb3d5d"></script>
 </head>
@@ -307,6 +329,11 @@
 
   <!-- Девочка с часами - теперь в 2 раза больше -->
   <img src="/images/timegirl.png" alt="Девочка показывает на часы" class="time-girl" id="timeGirl" />
+
+  <!-- Цитата дня -->
+  <div id="quoteContainer" aria-label="Цитата дня">
+    <span id="quoteText">Загрузка цитаты...</span>
+  </div>
 
   <div class="notepad-section">
     <img src="/images/left.png" alt="Левое изображение" class="side-image" />
@@ -516,6 +543,57 @@
 
     // Инициализация отображения таймера
     updateTimerDisplay();
+
+    // Цитата дня
+    const quotes = [
+      "Без труда не вытащишь и рыбку из пруда.",
+      "Делу время, потехе час.",
+      "Учение — свет, а неучение — тьма.",
+      "Лучше меньше, да лучше.",
+      "Век живи — век учись.",
+      "Не место красит человека, а человек место.",
+      "Терпение и труд всё перетрут.",
+      "Семь раз отмерь, один раз отрежь.",
+      "Сила есть — ума не надо.",
+      "Кто рано встаёт, тому Бог подаёт."
+    ];
+
+    const quoteElement = document.getElementById('quoteText');
+    const quoteContainer = document.getElementById('quoteContainer');
+
+    function getTodayKey() {
+      const now = new Date();
+      return now.toISOString().slice(0, 10); // YYYY-MM-DD
+    }
+
+    function getDailyQuote() {
+      const today = getTodayKey();
+      const saved = JSON.parse(localStorage.getItem('dailyQuote') || '{}');
+
+      if (saved.date === today && saved.text) {
+        return saved.text;
+      } else {
+        const index = (new Date(today).getTime() / 86400000) % quotes.length;
+        const quote = quotes[Math.floor(index)];
+        localStorage.setItem('dailyQuote', JSON.stringify({ date: today, text: quote }));
+        return quote;
+      }
+    }
+
+    function updateQuote() {
+      quoteElement.textContent = getDailyQuote();
+    }
+
+    // Обновить цитату сразу
+    updateQuote();
+
+    // Обновить цитату в 00:00
+    const now = new Date();
+    const millisTillMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() - now.getTime();
+    setTimeout(() => {
+      updateQuote();
+      setInterval(updateQuote, 24 * 60 * 60 * 1000); // Ежедневное обновление
+    }, millisTillMidnight);
   </script>
 </body>
 </html>
